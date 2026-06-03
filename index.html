@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AR Tracing Studio — Draw Like a Pro</title>
+    <meta name="description" content="Overlay any PNG image onto your camera feed and trace it onto paper like a professional artist. AR Tracing Studio helps you draw anything.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ====== DASHBOARD ====== -->
+    <div id="dashboardView" class="view active">
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="brand-icon"><i class="fas fa-pen-nib"></i></div>
+                <div class="brand-text">
+                    <span class="brand-name">AR Tracing Studio</span>
+                    <span class="brand-sub">Draw Anything, Anywhere</span>
+                </div>
+            </div>
+            <div class="header-badge">
+                <span class="pulse-dot"></span> Ready
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+
+            <!-- ===== LEFT PANEL: Search & Import ===== -->
+            <aside class="left-panel">
+
+                <!-- Google PNG Search -->
+                <div class="panel-card" id="searchCard">
+                    <div class="card-header">
+                        <div class="card-icon google-icon"><i class="fab fa-google"></i></div>
+                        <div>
+                            <h2 class="card-title">Search PNG Images</h2>
+                            <p class="card-desc">Opens Google Images filtered for transparent PNGs</p>
+                        </div>
+                    </div>
+                    <div class="search-bar-wrapper">
+                        <i class="fas fa-search search-icon-inner"></i>
+                        <input
+                            type="text"
+                            id="googleSearchInput"
+                            class="search-input"
+                            placeholder="e.g. anime cat, dragon, flower..."
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button id="googleSearchBtn" class="search-btn" title="Search Google Images for PNGs">
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <p class="hint-text"><i class="fas fa-lightbulb"></i> After searching, copy the image URL or save the PNG and import below.</p>
+                </div>
+
+                <!-- Import Image -->
+                <div class="panel-card" id="importCard">
+                    <div class="card-header">
+                        <div class="card-icon import-icon"><i class="fas fa-upload"></i></div>
+                        <div>
+                            <h2 class="card-title">Import Image</h2>
+                            <p class="card-desc">Upload a local file or paste a URL</p>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="dropZone">
+                        <i class="fas fa-cloud-arrow-up drop-icon"></i>
+                        <p class="drop-label">Drag & drop your image here</p>
+                        <p class="drop-sub">PNG, JPG, WEBP, GIF supported</p>
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <button class="btn-outline" id="browseBtn">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                    </div>
+
+                    <!-- URL Input -->
+                    <div class="url-row">
+                        <i class="fas fa-link url-icon"></i>
+                        <input
+                            type="url"
+                            id="urlInput"
+                            class="url-input"
+                            placeholder="Paste image URL here..."
+                            autocomplete="off"
+                        >
+                        <button id="urlLoadBtn" class="url-load-btn" title="Load from URL">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- How it works -->
+                <div class="panel-card how-card">
+                    <h3 class="how-title"><i class="fas fa-circle-question"></i> How to Use</h3>
+                    <ol class="how-steps">
+                        <li><span class="step-num">1</span> Search or import a PNG image</li>
+                        <li><span class="step-num">2</span> Click <strong>Open Camera</strong> to start AR mode</li>
+                        <li><span class="step-num">3</span> Place your device over paper</li>
+                        <li><span class="step-num">4</span> Adjust opacity &amp; trace away!</li>
+                    </ol>
+                </div>
+
+            </aside>
+
+            <!-- ===== RIGHT PANEL: Preview ===== -->
+            <section class="right-panel">
+                <div class="preview-card" id="previewCard">
+                    <div class="preview-empty" id="previewEmpty">
+                        <div class="empty-animation">
+                            <i class="fas fa-image empty-icon"></i>
+                            <div class="empty-rings">
+                                <div class="ring ring1"></div>
+                                <div class="ring ring2"></div>
+                                <div class="ring ring3"></div>
+                            </div>
+                        </div>
+                        <h3>No Image Selected</h3>
+                        <p>Search or import an image to get started</p>
+                    </div>
+                    <div class="preview-loaded" id="previewLoaded" style="display:none;">
+                        <div class="preview-img-wrap">
+                            <img id="previewImg" src="" alt="Preview" draggable="false">
+                        </div>
+                        <div class="preview-info">
+                            <span id="previewName" class="preview-filename">image.png</span>
+                            <span id="previewSize" class="preview-size"></span>
+                        </div>
+                        <button class="btn-camera" id="openCameraBtn">
+                            <i class="fas fa-camera"></i>
+                            <span>Open Camera &amp; Trace</span>
+                            <div class="btn-glow"></div>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ====== AR WORKSPACE VIEW ====== -->
+    <div id="workspaceView" class="view">
+
+        <!-- AR Viewport -->
+        <div class="ar-viewport" id="arViewport">
+            <!-- Live camera feed -->
+            <video id="cameraFeed" autoplay playsinline muted></video>
+
+            <!-- Overlay canvas for the image -->
+            <canvas id="overlayCanvas"></canvas>
+
+            <!-- Lock overlay (shown when locked) -->
+            <div class="lock-overlay" id="lockOverlay" style="display:none;">
+                <div class="lock-badge"><i class="fas fa-lock"></i> Canvas Locked — Trace Freely</div>
+            </div>
+        </div>
+
+        <!-- ===== FLOATING CONTROLS (Bottom Sheet) ===== -->
+        <div class="controls-sheet" id="controlsSheet">
+            <div class="sheet-handle-wrap" id="sheetHandleWrap">
+                <div class="sheet-handle"></div>
+                <span class="sheet-collapse-hint">TAP TO HIDE</span>
+            </div>
+
+            <!-- Top Row: Back + Title + Lock -->
+            <div class="controls-topbar">
+                <button class="ctrl-btn" id="backBtn" title="Back to Dashboard">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="ctrl-title">AR Workspace</span>
+                <button class="ctrl-btn lock-btn" id="lockBtn" title="Lock Canvas">
+                    <i class="fas fa-lock-open" id="lockIcon"></i>
+                </button>
+            </div>
+
+            <!-- Opacity Control -->
+            <div class="slider-group">
+                <div class="slider-label-row">
+                    <label class="slider-label"><i class="fas fa-droplet"></i> Image Opacity</label>
+                    <span class="slider-value" id="opacityValue">70%</span>
+                </div>
+                <div class="slider-track-wrap">
+                    <input type="range" id="opacitySlider" class="fancy-slider opacity-slider" min="0" max="100" value="70">
+                </div>
+            </div>
+
+            <!-- Zoom Control -->
+            <div class="slider-group">
+                <div class="slider-label-row">
+                    <label class="slider-label"><i class="fas fa-magnifying-glass-plus"></i> Zoom</label>
+                    <span class="slider-value" id="zoomValue">100%</span>
+                </div>
+                <div class="slider-track-wrap">
+                    <input type="range" id="zoomSlider" class="fancy-slider zoom-slider" min="10" max="300" value="100">
+                </div>
+            </div>
+
+            <!-- Rotation Control -->
+            <div class="slider-group">
+                <div class="slider-label-row">
+                    <label class="slider-label"><i class="fas fa-rotate"></i> Rotation</label>
+                    <span class="slider-value" id="rotateValue">0°</span>
+                </div>
+                <div class="slider-track-wrap">
+                    <input type="range" id="rotateSlider" class="fancy-slider rotate-slider" min="-180" max="180" value="0">
+                </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="quick-actions">
+                <button class="action-btn" id="flipHBtn" title="Flip Horizontal">
+                    <i class="fas fa-left-right"></i>
+                    <span>Flip H</span>
+                </button>
+                <button class="action-btn" id="flipVBtn" title="Flip Vertical">
+                    <i class="fas fa-up-down"></i>
+                    <span>Flip V</span>
+                </button>
+                <button class="action-btn" id="invertBtn" title="Toggle Outline / Invert">
+                    <i class="fas fa-circle-half-stroke"></i>
+                    <span>Outline</span>
+                </button>
+                <button class="action-btn" id="resetBtn" title="Reset Transforms">
+                    <i class="fas fa-arrows-rotate"></i>
+                    <span>Reset</span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ====== TOAST NOTIFICATIONS ====== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ====== ERROR MODAL ====== -->
+    <div class="modal-overlay" id="modalOverlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <h3 id="modalTitle">Error</h3>
+            <p id="modalMessage">Something went wrong.</p>
+            <button class="btn-modal-close" id="modalCloseBtn">OK, Got it</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
