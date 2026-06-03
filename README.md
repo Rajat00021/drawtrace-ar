@@ -62,7 +62,7 @@ This project was developed using AI-assisted software development tools to accel
 
 ## Live Demo
 
-Add your Netlify deployment link here.
+https://dulcet-capybara-be6261.netlify.app/
 
 ## License
 
